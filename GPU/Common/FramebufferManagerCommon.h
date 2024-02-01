@@ -521,7 +521,7 @@ protected:
 	void ResizeFramebufFBO(VirtualFramebuffer *vfb, int w, int h, bool force = false, bool skipCopy = false);
 
 	static bool ShouldDownloadFramebufferColor(const VirtualFramebuffer *vfb);
-	static bool ShouldDownloadFramebufferDepth(const VirtualFramebuffer *vfb);
+	bool ShouldDownloadFramebufferDepth(const VirtualFramebuffer *vfb);
 	void DownloadFramebufferOnSwitch(VirtualFramebuffer *vfb);
 
 	bool FindTransferFramebuffer(u32 basePtr, int stride, int x, int y, int w, int h, int bpp, bool destination, BlockTransferRect *rect);
@@ -649,6 +649,10 @@ protected:
 	// Depth readback helper state
 	u8 *convBuf_ = nullptr;
 	u32 convBufSize_ = 0;
+
+	// Half-skip toggles.
+	bool halfSkipDownloadFramebufferOnSwitch_ = false;
+	bool halfSkipShouldDownloadFramebufferDepth_ = false;
 };
 
 // Should probably live elsewhere.
