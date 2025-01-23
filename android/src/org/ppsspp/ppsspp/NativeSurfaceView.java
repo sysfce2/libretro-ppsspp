@@ -76,48 +76,6 @@ public class NativeSurfaceView extends SurfaceView implements SensorEventListene
 		return (ev.getSource() & source) == source;
 	}
 
-	// Note: This only has something to override in Android API 12 and later. Below that, it probably
-	// just won't get called.
-	@Override
-	public boolean onGenericMotionEvent(final MotionEvent ev) {
-		if (!isFromSource(ev, InputDevice.SOURCE_MOUSE)) {
-			return false;
-		}
-		switch (ev.getActionMasked()) {
-			case MotionEvent.ACTION_HOVER_ENTER:
-				// Log.i(TAG, "Mouse entered at " + ev.getX() + ", " + ev.getY());
-				return true;
-			case MotionEvent.ACTION_HOVER_EXIT:
-				// Log.i(TAG, "Mouse exited at " + ev.getX() + ", " + ev.getY());
-				return true;
-			case MotionEvent.ACTION_HOVER_MOVE:
-				NativeApp.mouse(ev.getX(), ev.getY(), 0, 0);
-				return true;
-			default:
-				break;
-		}
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			switch (ev.getActionMasked()) {
-				case MotionEvent.ACTION_BUTTON_PRESS: {
-					int button = ev.getActionButton();
-					NativeApp.mouse(ev.getX(), ev.getY(), button, 1);
-					return true;
-				}
-				case MotionEvent.ACTION_BUTTON_RELEASE: {
-					int button = ev.getActionButton();
-					NativeApp.mouse(ev.getX(), ev.getY(), button, 2);
-					return true;
-				}
-				default:
-					break;
-			}
-		}
-
-		Log.i(TAG, "Other generic motion event " + ev.getActionMasked());
-		return true;
-	}
-
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
 	private boolean onMouseEventModern(final MotionEvent ev) {
 		if (!isFromSource(ev, InputDevice.SOURCE_MOUSE)) {
@@ -125,25 +83,26 @@ public class NativeSurfaceView extends SurfaceView implements SensorEventListene
 		}
 		switch (ev.getActionMasked()) {
 			case MotionEvent.ACTION_DOWN: {
-				Log.i(TAG, "Action down. button state: " + ev.getButtonState());
+				// Log.i(TAG, "Action down. button state: " + ev.getButtonState());
 				NativeApp.mouse(ev.getX(), ev.getY(), 1, 1);
-				return true;
+				break;
 			}
 			case MotionEvent.ACTION_UP: {
-				Log.i(TAG, "Action up. button state: " + ev.getButtonState());
+				// Log.i(TAG, "Action up. button state: " + ev.getButtonState());
 				NativeApp.mouse(ev.getX(), ev.getY(), 1, 2);
-				return true;
+				break;
 			}
 			case MotionEvent.ACTION_MOVE: {
-				Log.i(TAG, "Action move. button state: " + ev.getButtonState());
+				// Log.i(TAG, "Action move. button state: " + ev.getButtonState());
 				NativeApp.mouse(ev.getX(), ev.getY(), 0, 0);
-				return true;
+				break;
 			}
 			default: {
 				Log.i(TAG, "Unhandled modern mouse action: " + ev.getAction());
-				return true;
+				break;
 			}
 		}
+		return true;
 	}
 
 	@SuppressLint("ClickableViewAccessibility")
@@ -152,7 +111,7 @@ public class NativeSurfaceView extends SurfaceView implements SensorEventListene
 		boolean canReadToolType = Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-			// This is where good mouse support arrived.
+			// This is where workable mouse support arrived.
 			if (onMouseEventModern(ev)) {
 				return true;
 			}

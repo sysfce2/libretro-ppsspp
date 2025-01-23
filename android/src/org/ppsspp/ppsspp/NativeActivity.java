@@ -1082,17 +1082,15 @@ public abstract class NativeActivity extends Activity {
 	@Override
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
 	public boolean onGenericMotionEvent(MotionEvent event) {
-		// Log.d(TAG, "onGenericMotionEvent: " + event);
+		// Log.i(TAG, "NativeActivity onGenericMotionEvent: " + event);
 		if (InputDeviceState.inputSourceIsJoystick(event.getSource())) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
-				InputDeviceState state = getInputDeviceState(event);
-				if (state == null) {
-					Log.w(TAG, "Joystick event but failed to get input device state.");
-					return super.onGenericMotionEvent(event);
-				}
-				state.onJoystickMotion(event);
-				return true;
+			InputDeviceState state = getInputDeviceState(event);
+			if (state == null) {
+				Log.w(TAG, "Joystick event but failed to get input device state.");
+				return super.onGenericMotionEvent(event);
 			}
+			state.onJoystickMotion(event);
+			return true;
 		}
 
 		if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) != 0) {
@@ -1107,10 +1105,28 @@ public abstract class NativeActivity extends Activity {
 			switch (event.getAction()) {
 			case MotionEvent.ACTION_HOVER_MOVE:
 				// process the mouse hover movement...
+				NativeApp.mouse(event.getX(), event.getY(), 0, 0);
 				return true;
 			case MotionEvent.ACTION_SCROLL:
 				NativeApp.mouseWheelEvent(event.getAxisValue(MotionEvent.AXIS_HSCROLL), event.getAxisValue(MotionEvent.AXIS_VSCROLL));
 				return true;
+			}
+		}
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			switch (event.getActionMasked()) {
+				case MotionEvent.ACTION_BUTTON_PRESS: {
+					int button = event.getActionButton();
+					NativeApp.mouse(event.getX(), event.getY(), button, 1);
+					return true;
+				}
+				case MotionEvent.ACTION_BUTTON_RELEASE: {
+					int button = event.getActionButton();
+					NativeApp.mouse(event.getX(), event.getY(), button, 2);
+					return true;
+				}
+				default:
+					break;
 			}
 		}
 		return super.onGenericMotionEvent(event);
