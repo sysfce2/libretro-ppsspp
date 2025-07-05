@@ -72,7 +72,6 @@ if(CMAKE_SYSTEM_PROCESSOR)
 	elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^loongarch64")
 		set(LOONGARCH64_DEVICE ON)
 		add_compile_options(-mlsx)
-		add_compile_options(-mlasx)
 	else()
 		message("Unknown CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
 	endif()
@@ -2252,6 +2251,8 @@ add_library(${CoreLibName} ${CoreLinkType}
 	Core/HLE/sceNet.h
 	Core/HLE/sceNet_lib.cpp
 	Core/HLE/sceNet_lib.h
+	Core/HLE/NetAdhocCommon.cpp
+	Core/HLE/NetAdhocCommon.h
 	Core/HLE/sceNetAdhoc.cpp
 	Core/HLE/sceNetAdhoc.h
 	Core/HLE/sceNetAdhocMatching.cpp
